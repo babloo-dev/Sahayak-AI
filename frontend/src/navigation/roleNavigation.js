@@ -30,7 +30,7 @@ export const roleNavigation = {
         title: 'My Reports',
         description: 'Track only the reports submitted by you and their rescue status.',
         placeholder:
-          'Your reports and current rescue stages will appear here after citizen-specific API access is implemented.',
+          'Your own submitted reports and current rescue stages will appear here.',
       },
       {
         id: 'early-warning',
@@ -62,7 +62,7 @@ export const roleNavigation = {
         title: 'Rescue Team Dashboard',
         description: 'Your authorized assignments and response work.',
         placeholder:
-          'Team assignments and response summaries will appear here when authorized backend access is implemented.',
+          'Your authorized assignments and response summaries will appear here.',
       },
       {
         id: 'assigned-incidents',
@@ -70,7 +70,7 @@ export const roleNavigation = {
         title: 'Assigned Incidents',
         description: 'Review incidents assigned to your rescue team.',
         placeholder:
-          'Assigned incident records are not connected. No sample or live incidents are shown.',
+          'Incidents assigned to your authenticated team are loaded from the backend.',
       },
       {
         id: 'response-updates',
@@ -78,7 +78,7 @@ export const roleNavigation = {
         title: 'Update Response Status',
         description: 'Record progress for an authorized assignment.',
         placeholder:
-          'Status updates and response history will be available after the authorized API workflow is implemented.',
+          'Advance an assigned incident through the supported response statuses.',
       },
     ],
   },

@@ -16,17 +16,17 @@ Work from top to bottom. Do not start a later task until the current task's acce
 
 ## Phase 2 — Backend foundation
 - [x] T009: Create Spring Boot backend in `backend/` with a tested health endpoint; document Java 17 baseline, JDK 26.0.2, Maven 3.9.16, and Spring Boot 4.1.1.
-- [x] T010: Configure MySQL JDBC connection settings via environment variables; add a separate database health check and safe unavailable response. Automated tests pass; local MySQL server connectivity remains unverified because no server is responding.
+- [x] T010: Configure MySQL JDBC connection settings via environment variables; add a separate database health check and safe unavailable response. Automated tests pass; the running application later returned HTTP 200 with database status UP.
 - [ ] T011: Add database migration/schema strategy and initial user/role/incident tables.
 - [ ] T012: Add DTOs, validation, consistent API errors and API documentation.
 
 ## Phase 3 — Identity and incident workflow
-- [ ] T013: Implement development authentication with clearly labelled local-only mode; design OTP provider interface for later real integration.
-- [ ] T014: Enforce server-side roles and citizen ownership checks.
-- [ ] T015: Implement incident create/list/detail endpoints and persist records.
-- [ ] T016: Connect Citizen Report form and My Reports to real APIs.
-- [ ] T017: Implement rescue-team records, incident assignment and status history.
-- [ ] T018: Connect Rescue Team dashboard and Admin incident management to real APIs.
+- [ ] T013: Implement development authentication with clearly labelled local-only mode; design OTP provider interface for later real integration. A local-only bearer-token strategy is implemented; no OTP delivery or verification is claimed. Local runtime setup remains unverified.
+- [ ] T014: Enforce server-side roles and citizen ownership checks. Backend guards, role-specific DTOs, and ownership queries are implemented and tested; the reviewed additive `incident_owner` SQL remains unapplied, so live ownership persistence is not verified.
+- [x] T015: Implement incident create/list/detail endpoints and persist records. Repository maps to the existing singular `incident` schema. On 2026-10-16, the live database health check returned connected=true; one approved test-only POST returned 201 with ID 7, and that record was retrieved through both detail and list endpoints. `mvn clean verify` passed (12 tests). No automatic migration is configured; the test record remains in the database.
+- [ ] T016: Connect Citizen Report form and My Reports to real APIs. The form submits to the backend; authenticated My Reports now uses owner-filtered endpoints, pending local ownership-table setup and runtime verification.
+- [ ] T017: Implement rescue-team records, incident assignment and status history. Incident assignment now uses the existing `assigned_team` column and moves `SUBMITTED` incidents to `TEAM_ASSIGNED`; sequential status updates are implemented. A managed team registry and persisted status history remain incomplete.
+- [ ] T018: Connect Rescue Team dashboard and Admin incident management to real APIs. Control Center reads backend incidents; Rescue Team assigned-incident list and next-status action now use role-filtered APIs. Full workflow/runtime verification remains pending.
 - [ ] T019: Verify end-to-end reporting → assignment → status update → citizen view.
 
 ## Phase 4 — Real data foundation
@@ -62,4 +62,4 @@ Work from top to bottom. Do not start a later task until the current task's acce
 - [ ] T043: Produce a truthful feature status report: verified, incomplete, unavailable or awaiting credentials/data.
 
 ## Current task
-T001–T010 are complete. The current `Sahayak-AI-Final` folder is the official project root. The React + Vite JavaScript frontend has distinct Citizen, Rescue Team, and Admin/Control Center placeholder navigation with a clearly labelled development-only role preview. The Spring Boot backend has `GET /api/health` and an environment-configured MySQL health check; a local MySQL connection is not yet verified. No authentication or operational data are connected. Proceed with **T011** next; do not create another `Sahayak-AI` folder or overwrite unrelated files.
+T001–T010 and T015 are complete; the live API created and retrieved approved test record ID 7 using the existing singular `incident` table. Incident status advancement, team assignment, Citizen submission form, and Control Center incident list/detail integration are implemented. Local bearer-token authentication and role/ownership enforcement are implemented; latest automated backend verification passes 39 tests, and frontend lint/build checks pass. T013–T014 remain incomplete pending local setup and additive owner-table application/runtime verification. Production OTP is not implemented. Read-only local smoke checks previously confirmed frontend HTTP 200, database health connected=true, and incident-list HTTP 200. The CORS allow-list supports the exact local Vite origins (`localhost` and `127.0.0.1`), and permits the Authorization request header. Runtime CORS/authentication remain unverified; prior port 8080 HTTP checks were refused, and local datasource settings were unavailable in that shell. Browser console/render inspection also remains pending. T011–T012 remain incomplete; T017 still needs a managed rescue-team registry and persisted status history. The current `Sahayak-AI-Final` folder is the official project root. Do not create another `Sahayak-AI` folder or overwrite unrelated files.

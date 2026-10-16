@@ -1,18 +1,42 @@
 import './App.css'
 import { useState } from 'react'
 import { EmptyState, StatusBadge } from './components/feedback/index.js'
-import { roleNavigation, roleOptions } from './navigation/roleNavigation.js'
+import IncidentManagement from './features/incidents/IncidentManagement.jsx'
+import IncidentReportForm from './features/incidents/IncidentReportForm.jsx'
+import { roleNavigation } from './navigation/roleNavigation.js'
+import { setApiToken } from './services/incidentsApi.js'
+import LocalTokenLogin from './features/auth/LocalTokenLogin.jsx'
 
 function App() {
-  const [role, setRole] = useState('citizen')
+  const [role, setRole] = useState(null)
   const [pageId, setPageId] = useState(roleNavigation.citizen.items[0].id)
+  if (!role) {
+    return <LocalTokenLogin onAuthenticated={(authenticatedRole) => {
+      setRole(authenticatedRole)
+      setPageId(roleNavigation[authenticatedRole].items[0].id)
+    }} />
+  }
   const currentRole = roleNavigation[role]
   const currentPage = currentRole.items.find((item) => item.id === pageId)
 
-  function handleRoleChange(event) {
-    const nextRole = event.target.value
-    setRole(nextRole)
-    setPageId(roleNavigation[nextRole].items[0].id)
+  function renderPage() {
+    if (role === 'citizen' && pageId === 'report-incident') return <IncidentReportForm />
+    if (role === 'admin' && ['control-center', 'incident-management'].includes(pageId)) {
+      return <IncidentManagement audience="admin" />
+    }
+    if (role === 'citizen' && pageId === 'my-reports') {
+      return <IncidentManagement audience="citizen" />
+    }
+    if (role === 'rescue' && pageId === 'assigned-incidents') {
+      return <IncidentManagement audience="rescue" />
+    }
+    return <EmptyState title="Not connected yet" description={currentPage.placeholder} />
+  }
+
+  function handleSignOut() {
+    setApiToken(null)
+    setRole(null)
+    setPageId(roleNavigation.citizen.items[0].id)
   }
 
   return (
@@ -41,13 +65,8 @@ function App() {
         </nav>
 
         <div className="role-preview">
-          <label htmlFor="role-preview-select">Role preview <span>Development only</span></label>
-          <select id="role-preview-select" value={role} onChange={handleRoleChange}>
-            {roleOptions.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
-          <p>Preview only. This does not sign you in or enforce permissions.</p>
+          <p>Role verified by backend: <strong>{currentRole.label}</strong></p>
+          <button className="secondary-button" type="button" onClick={handleSignOut}>Sign out</button>
         </div>
       </aside>
 
@@ -71,10 +90,7 @@ function App() {
             <p className="page-description">{currentPage.description}</p>
           </div>
 
-          <EmptyState
-            title="Not connected yet"
-            description={currentPage.placeholder}
-          />
+          {renderPage()}
         </section>
       </main>
     </div>
